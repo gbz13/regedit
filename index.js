@@ -33,9 +33,9 @@ client.on('messageCreate', async (message) => {
   if (message.content === '!drip') {
 
     const embed = new EmbedBuilder()
-      .setTitle('🔥 FFH4X ANDROID - SEVEN CLIENT 🔥')
+      .setTitle('🔥 FFH4X ANDROID - GBZ CLIENT 🔥')
       .setDescription(`
-🔥 **FFH4X ANDROID - SEVEN CLIENT**
+🔥 **FFH4X ANDROID - GBZ CLIENT**
 
 🛡️ **SEGURO & FUNCIONAL**
 ✔ Compatível com Android 9 até Android 17  
