@@ -73,10 +73,10 @@ client.on('messageCreate', async (message) => {
       .setCustomId('drip_produto_gbz')
       .setPlaceholder('📦 Selecione a quantidade de dias')
       .addOptions([
-        { label: 'FFH4X ANDROID 1 DIA', description: 'R$15,00', value: '15' },
-        { label: 'FFH4X ANDROID 7 DIAS', description: 'R$40,00', value: '40' },
-        { label: 'FFH4X ANDROID 15 DIAS', description: 'R$45,00', value: '45' },
-        { label: 'FFH4X ANDROID 30 DIAS', description: 'R$60,00', value: '60' }
+        { label: 'FFH4X ANDROID 1 DIA🛒', description: 'R$15,00', value: '15' },
+        { label: 'FFH4X ANDROID 7 DIAS🛒', description: 'R$40,00', value: '40' },
+        { label: 'FFH4X ANDROID 15 DIAS🛒', description: 'R$45,00', value: '45' },
+        { label: 'FFH4X ANDROID 30 DIAS🛒', description: 'R$60,00', value: '60' }
       ]);
 
     message.channel.send({
