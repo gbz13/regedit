@@ -21,9 +21,6 @@ const client = new Client({
 const DONO_ID = process.env.DONO_ID;
 const PIX = process.env.PIX;
 
-// 🔒 anti duplicação
-const criando = new Set();
-
 client.once('ready', () => {
   console.log(`🔥 Bot online como ${client.user.tag}`);
 });
@@ -47,8 +44,8 @@ client.on('messageCreate', async (message) => {
 ❌ Sem Shizuku  
 ❌ Sem alterar data  
 
-⚡ **ENTREGA AUTOMÁTICA**
-📩 Receba após a confirmação  
+⚡ **ENTREGA**
+📩 Receba após a confirmação do pagamento  
 🔐 Mais seguro que FFH4X comum  
 💸 Preço acessível  
 📱 Direto no celular  
@@ -63,8 +60,8 @@ client.on('messageCreate', async (message) => {
 
 💎 **BENEFÍCIOS**
 ✔ Comprar diamantes normalmente  
-✔ App aparece como Play Store  
-✔ Mais segurança  
+✔ Aplicativo aparece como Play Store  
+✔ Mais segurança e discrição  
 
 ━━━━━━━━━━━━━━━━━━━━━━
 📦 **ESCOLHA SEU PLANO ABAIXO**
@@ -76,17 +73,15 @@ client.on('messageCreate', async (message) => {
       .setCustomId('drip_produto_gbz')
       .setPlaceholder('📦 Selecione a quantidade de dias')
       .addOptions([
-        { label: '1 DIA', description: 'R$15,00', value: '15' },
-        { label: '7 DIAS', description: 'R$40,00', value: '40' },
-        { label: '15 DIAS', description: 'R$45,00', value: '45' },
-        { label: '30 DIAS', description: 'R$60,00', value: '60' }
+        { label: 'FFH4X ANDROID 1 DIA', description: 'R$15,00', value: '15' },
+        { label: 'FFH4X ANDROID 7 DIAS', description: 'R$40,00', value: '40' },
+        { label: 'FFH4X ANDROID 15 DIAS', description: 'R$45,00', value: '45' },
+        { label: 'FFH4X ANDROID 30 DIAS', description: 'R$60,00', value: '60' }
       ]);
-
-    const row = new ActionRowBuilder().addComponents(select);
 
     message.channel.send({
       embeds: [embed],
-      components: [row]
+      components: [new ActionRowBuilder().addComponents(select)]
     });
   }
 
@@ -98,31 +93,10 @@ client.on('interactionCreate', async (interaction) => {
   // ================= COMPRA
   if (interaction.isStringSelectMenu() && interaction.customId === 'drip_produto_gbz') {
 
-    if (criando.has(interaction.user.id)) {
-      return interaction.reply({
-        content: '⏳ Aguarde...',
-        ephemeral: true
-      });
-    }
-
-    criando.add(interaction.user.id);
-
     const valor = interaction.values[0];
 
-    const existente = interaction.guild.channels.cache.find(c =>
-      c.name === `compra-${interaction.user.id}`
-    );
-
-    if (existente) {
-      criando.delete(interaction.user.id);
-      return interaction.reply({
-        content: `❌ Você já possui um ticket: ${existente}`,
-        ephemeral: true
-      });
-    }
-
     const canal = await interaction.guild.channels.create({
-      name: `compra-${interaction.user.username}`,
+      name: `compra-${interaction.user.id}`,
       type: ChannelType.GuildText,
       permissionOverwrites: [
         { id: interaction.guild.id, deny: [PermissionsBitField.Flags.ViewChannel] },
@@ -140,7 +114,12 @@ client.on('interactionCreate', async (interaction) => {
 📲 **Chave PIX:**
 \`${PIX}\`
 
-📌 Após pagar, aguarde o dono confirmar o pagamento.
+📌 **INSTRUÇÕES:**
+• Realize o pagamento via PIX  
+• Após pagar, aguarde o dono confirmar  
+• Não precisa enviar comprovante  
+
+⏳ Assim que confirmado, sua key será enviada aqui no ticket.
       `)
       .setColor('#8A2BE2')
       .setThumbnail('https://media.discordapp.net/attachments/1482528899903782932/1484254280088027216/file_000000008530720eb8922a615208f883.png');
@@ -155,25 +134,19 @@ client.on('interactionCreate', async (interaction) => {
       .setLabel('Fechar Ticket')
       .setStyle(ButtonStyle.Danger);
 
-    const row = new ActionRowBuilder().addComponents(confirmar, fechar);
-
     await canal.send({
-      content: `${interaction.user}`,
+      content: `🎟️ TICKET DE COMPRA\n${interaction.user}`,
       embeds: [embed],
-      components: [row]
+      components: [new ActionRowBuilder().addComponents(confirmar, fechar)]
     });
 
-    await interaction.reply({
-      content: `✅ Ticket criado: ${canal}`,
+    interaction.reply({
+      content: `✅ Seu ticket foi criado: ${canal}`,
       ephemeral: true
     });
-
-    setTimeout(() => {
-      criando.delete(interaction.user.id);
-    }, 5000);
   }
 
-  // ================= CONFIRMAR (SÓ DONO)
+  // ================= CONFIRMAR (DONO)
   if (interaction.isButton() && interaction.customId === 'confirmar_pagamento') {
 
     if (interaction.user.id !== DONO_ID) {
@@ -184,18 +157,20 @@ client.on('interactionCreate', async (interaction) => {
     }
 
     await interaction.channel.send(`
-✅ **Pagamento confirmado!**
+✅ **PAGAMENTO CONFIRMADO!**
 
-🔑 A key será enviada aqui pelo dono quando estiver online.
+🔑 Sua key será enviada neste ticket pelo dono.
+
+📲 Aguarde, estamos finalizando seu atendimento.
     `);
 
     interaction.reply({
-      content: '✔️ Confirmado!',
+      content: '✔️ Pagamento confirmado!',
       ephemeral: true
     });
   }
 
-  // ================= FECHAR TICKET
+  // ================= FECHAR
   if (interaction.isButton() && interaction.customId === 'fechar_ticket') {
 
     await interaction.reply({
