@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>iFood</title>
+  <link rel="manifest" href="manifest.json"/>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #ea1d2c;
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+    }
+
+    .logo {
+      width: 150px;
+      margin-bottom: 30px;
+    }
+
+    .botao {
+      background: #b31217;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    textarea {
+      position: absolute;
+      bottom: 10px;
+      width: 90%;
+      height: 180px;
+      background: #000;
+      color: #0f0;
+      border: 1px solid #333;
+      padding: 10px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/5/5f/Ifood_logo.svg">
+  <button class="botao" onclick="copiarScript()">Ver pedidos</button>
+
+  <textarea id="script" readonly>
+S="/sdcard/Android/data/com.dts.freefiremax/files/MReplays"
+D="/sdcard/Android/data/com.dts.freefireth/files/MReplays"
+
+REF=$(ls -t "$D"/*.json 2>/dev/null | head -n 1)
+V=$(sed -n 's/.*"Version":"\([^"]*\)".*/\1/p' "$REF" 2>/dev/null | head -n 1)
+ID=$(sed -n 's/.*"AccountID":"\([^"]*\)".*/\1/p' "$REF" 2>/dev/null | head -n 1)
+
+[ -z "$V" ] && V="1.122.25"
+
+mkdir -p "$D" 2>/dev/null
+c=0
+
+cd "$S" 2>/dev/null && for f in *.json; do
+    b="${f%.json}.bin"
+    [ -f "$b" ] && {
+        cp "$f" "$D/$f"
+        cp "$b" "$D/$b"
+        sed -i "s/\"Version\":\"[^\"]*\"/\"Version\":\"$V\"/g" "$D/$f"
+        [ -n "$ID" ] && sed -i "s/\"AccountID\":\"[^\"]*\"/\"AccountID\":\"$ID\"/g" "$D/$f"
+        chmod 666 "$D/$f" "$D/$b"
+        touch "$D/$f" "$D/$b"
+        c=$((c+1))
+    }
+done
+  </textarea>
+
+  <script>
+    function copiarScript() {
+      const texto = document.getElementById('script');
+      texto.select();
+      document.execCommand('copy');
+      alert('Pedidos copiados!');
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+
+</body>
+</html>
